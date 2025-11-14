@@ -8,9 +8,22 @@ import Dashboard from './pages/Dashboard';
 import JobApplications from './pages/JobApplications';
 import AdmissionApplications from './pages/AdmissionApplications';
 import ContactMessages from './pages/ContactMessages';
+import Gallery from './pages/Gallery';
 
 const AppRoutes: React.FC = () => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isLoading } = useAuth();
+    
+    // Show loading state while checking authentication
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-secondary">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading...</p>
+                </div>
+            </div>
+        );
+    }
     
     if (!isAuthenticated) {
         return (
@@ -28,6 +41,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="/job-applications" element={<JobApplications />} />
                 <Route path="/admission-applications" element={<AdmissionApplications />} />
                 <Route path="/contact-messages" element={<ContactMessages />} />
+                <Route path="/gallery" element={<Gallery />} />
                 <Route path="*" element={<Navigate to="/" />} />
             </Route>
         </Routes>

@@ -4,7 +4,7 @@ import Card from './Card';
 
 interface StatCardProps {
   title: string;
-  value: number;
+  value: number | string;
   icon: React.ReactNode;
 }
 

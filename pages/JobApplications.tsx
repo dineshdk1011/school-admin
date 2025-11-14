@@ -1,5 +1,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, getDocs, updateDoc, doc, Timestamp } from 'firebase/firestore';
 import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
@@ -8,19 +10,97 @@ import Button from '../components/ui/Button';
 import Pagination from '../components/ui/Pagination';
 import Modal from '../components/ui/Modal';
 import { JobApplication, Status } from '../types';
-import { MOCK_JOB_APPLICATIONS, STATUS_OPTIONS } from '../constants';
+import { STATUS_OPTIONS } from '../constants';
 import { useDebounce } from '../hooks/useDebounce';
 import { usePagination } from '../hooks/usePagination';
+
+// Firebase configuration for Firestore/Database
+const firestoreConfig = {
+  apiKey: "AIzaSyA1mtHVRk0TyWhGFc50JGfVMsFK4tLoxWg",
+  authDomain: "pranav-global-school---pgs.firebaseapp.com",
+  projectId: "pranav-global-school---pgs",
+  storageBucket: "pranav-global-school---pgs.firebasestorage.app",
+  messagingSenderId: "1052193372039",
+  appId: "1:1052193372039:web:f38831d3dbf591eee7c522"
+};
+
+// Initialize Firebase app for Firestore
+const firestoreApp = initializeApp(firestoreConfig, 'job-firestore');
+const db = getFirestore(firestoreApp);
 
 const ITEMS_PER_PAGE = 5;
 
 const JobApplications: React.FC = () => {
-  const [applications, setApplications] = useState<JobApplication[]>(MOCK_JOB_APPLICATIONS);
+  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [selectedApp, setSelectedApp] = useState<JobApplication | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editableApp, setEditableApp] = useState<JobApplication | null>(null);
+
+  // Load job applications from Firestore
+  useEffect(() => {
+    loadApplications();
+  }, []);
+
+  const loadApplications = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const jobApplicationsRef = collection(db, 'jobApplications');
+      const snapshot = await getDocs(jobApplicationsRef);
+      
+      const apps: JobApplication[] = [];
+      
+      snapshot.forEach((docSnapshot) => {
+        const data = docSnapshot.data();
+        
+        // Convert Firestore Timestamp to string
+        let createdAtStr = '';
+        if (data.createdAt) {
+          if (data.createdAt instanceof Timestamp) {
+            createdAtStr = data.createdAt.toDate().toLocaleDateString();
+          } else if (data.createdAt.toDate) {
+            createdAtStr = data.createdAt.toDate().toLocaleDateString();
+          } else {
+            createdAtStr = new Date(data.createdAt).toLocaleDateString();
+          }
+        } else {
+          createdAtStr = new Date().toLocaleDateString();
+        }
+        
+        // Map Firestore data to JobApplication interface
+        apps.push({
+          id: docSnapshot.id,
+          name: data.fullName || data.name || '',
+          email: data.email || '',
+          phone: data.phone || '',
+          city: data.city || '',
+          position: data.position || '',
+          resumeUrl: data.resumeUrl || '',
+          coverLetter: data.coverLetter || data.message || '',
+          status: (data.status as Status) || Status.New,
+          createdAt: createdAtStr
+        });
+      });
+      
+      // Sort by createdAt (newest first)
+      apps.sort((a, b) => {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return dateB - dateA;
+      });
+      
+      setApplications(apps);
+    } catch (err: any) {
+      console.error('Error loading job applications:', err);
+      setError('Failed to load job applications. Please check Firestore permissions.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
@@ -58,10 +138,29 @@ const JobApplications: React.FC = () => {
     setEditableApp(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (editableApp) {
-      setApplications(prev => prev.map(app => app.id === editableApp.id ? editableApp : app));
-      handleCloseModal();
+      try {
+        setError(null);
+        // Update in Firestore
+        const appRef = doc(db, 'jobApplications', editableApp.id);
+        await updateDoc(appRef, {
+          fullName: editableApp.name,
+          email: editableApp.email,
+          phone: editableApp.phone,
+          position: editableApp.position,
+          resumeUrl: editableApp.resumeUrl,
+          coverLetter: editableApp.coverLetter,
+          status: editableApp.status
+        });
+        
+        // Update local state
+        setApplications(prev => prev.map(app => app.id === editableApp.id ? editableApp : app));
+        handleCloseModal();
+      } catch (err: any) {
+        console.error('Error updating application:', err);
+        setError(`Failed to update application: ${err.message}`);
+      }
     }
   };
 
@@ -74,6 +173,13 @@ const JobApplications: React.FC = () => {
   return (
     <div>
       <h2 className="text-3xl font-bold text-primary mb-6">Job Applications</h2>
+      
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+          {error}
+        </div>
+      )}
+      
       <Card>
         <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
           <div className="w-full md:w-1/2 lg:w-1/3">
@@ -84,30 +190,38 @@ const JobApplications: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="w-full md:w-auto">
+          <div className="flex gap-2 w-full md:w-auto">
             <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
               <option value="All">All Statuses</option>
               {STATUS_OPTIONS.map(status => <option key={status} value={status}>{status}</option>)}
             </Select>
+            <Button onClick={loadApplications} variant="secondary" className="text-sm px-3 py-2">
+              Refresh
+            </Button>
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b bg-gray-50">
-                <th className="p-3 text-sm font-semibold text-gray-600">ID</th>
-                <th className="p-3 text-sm font-semibold text-gray-600">Name</th>
-                <th className="p-3 text-sm font-semibold text-gray-600">Email</th>
-                <th className="p-3 text-sm font-semibold text-gray-600">Position</th>
-                <th className="p-3 text-sm font-semibold text-gray-600">Status</th>
-                <th className="p-3 text-sm font-semibold text-gray-600">Date</th>
-                <th className="p-3 text-sm font-semibold text-gray-600">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentData.map(app => (
-                <tr key={app.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 text-sm text-gray-700">{app.id}</td>
+        {loading ? (
+          <div className="text-center py-8 text-gray-500">Loading job applications...</div>
+        ) : currentData.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">No job applications found.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b bg-gray-50">
+                  <th className="p-3 text-sm font-semibold text-gray-600">ID</th>
+                  <th className="p-3 text-sm font-semibold text-gray-600">Name</th>
+                  <th className="p-3 text-sm font-semibold text-gray-600">Email</th>
+                  <th className="p-3 text-sm font-semibold text-gray-600">Position</th>
+                  <th className="p-3 text-sm font-semibold text-gray-600">Status</th>
+                  <th className="p-3 text-sm font-semibold text-gray-600">Date</th>
+                  <th className="p-3 text-sm font-semibold text-gray-600">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentData.map(app => (
+                  <tr key={app.id} className="border-b hover:bg-gray-50">
+                    <td className="p-3 text-sm text-gray-700 font-mono">{app.id.substring(0, 8)}...</td>
                   <td className="p-3 text-sm font-medium text-gray-900">{app.name}</td>
                   <td className="p-3 text-sm text-gray-700">{app.email}</td>
                   <td className="p-3 text-sm text-gray-700">{app.position}</td>
@@ -116,12 +230,15 @@ const JobApplications: React.FC = () => {
                   <td className="p-3 text-sm text-gray-700">
                     <Button variant="secondary" onClick={() => handleView(app)}>View</Button>
                   </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <Pagination currentPage={currentPage} maxPage={maxPage} onPrev={prev} onNext={next} onJump={jump} />
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {!loading && currentData.length > 0 && (
+          <Pagination currentPage={currentPage} maxPage={maxPage} onPrev={prev} onNext={next} onJump={jump} />
+        )}
       </Card>
 
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={`Application: ${selectedApp?.id}`}
@@ -138,19 +255,38 @@ const JobApplications: React.FC = () => {
               <Input label="Name" name="name" value={editableApp.name} onChange={handleInputChange} />
               <Input label="Email" name="email" type="email" value={editableApp.email} onChange={handleInputChange} />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input label="City" name="city" value={editableApp.city} onChange={handleInputChange} />
+            <div>
+              <Input label="Phone" name="phone" value={editableApp.phone} onChange={handleInputChange} />
+            </div>
+            <div>
               <Input label="Position Applied For" name="position" value={editableApp.position} onChange={handleInputChange} />
             </div>
+            {editableApp.resumeUrl && (
+              <div>
+                <p className="block text-sm font-medium text-gray-700 mb-1">Resume</p>
+                <a 
+                  href={editableApp.resumeUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline text-sm"
+                >
+                  View Resume
+                </a>
+              </div>
+            )}
             <div>
               <Select label="Status" name="status" value={editableApp.status} onChange={handleInputChange}>
                 {STATUS_OPTIONS.map(status => <option key={status} value={status}>{status}</option>)}
               </Select>
             </div>
-            <div>
+            {editableApp.coverLetter && (
+              <div>
                 <p className="block text-sm font-medium text-gray-700 mb-1">Cover Letter</p>
-                <p className="text-gray-600 p-2 border rounded-md bg-gray-50">{editableApp.coverLetter}</p>
-            </div>
+                <p className="text-gray-600 p-2 border rounded-md bg-gray-50 whitespace-pre-wrap min-h-[100px]">
+                  {editableApp.coverLetter || 'No cover letter provided.'}
+                </p>
+              </div>
+            )}
           </div>
         )}
       </Modal>

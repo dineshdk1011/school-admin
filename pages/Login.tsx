@@ -1,20 +1,62 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
 
 const Login: React.FC = () => {
-  const { login } = useAuth();
+  const { login, isLoading, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      // Navigate to dashboard when authenticated
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+
+  // Don't render login form if already authenticated
+  if (isAuthenticated && !isLoading) {
+    return null;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!login(email, password)) {
-      setError('Invalid email or password. Please try again.');
+    setError('');
+    
+    // Basic validation
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter both email and password.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const success = await login(email.trim(), password);
+      
+      if (success) {
+        // Don't set isSubmitting to false here - let the redirect happen
+        // The useEffect will handle navigation when isAuthenticated changes
+        // AppRoutes will automatically show dashboard routes
+        return;
+      } else {
+        // Show error message above the button
+        setError('Invalid email or password. Please check your credentials and try again.');
+        setIsSubmitting(false);
+      }
+    } catch (err: any) {
+      // Show error message for any exceptions
+      setError('An error occurred during login. Please try again.');
+      console.error('Login error:', err);
+      setIsSubmitting(false);
     }
   };
 
@@ -47,9 +89,22 @@ const Login: React.FC = () => {
             required 
             placeholder="••••••••"
           />
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          <Button type="submit" className="w-full">
-            Login
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-2 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <span className="font-medium">{error}</span>
+              </div>
+            </div>
+          )}
+          <Button 
+            type="submit" 
+            className="w-full" 
+            disabled={isSubmitting || isLoading}
+          >
+            {isSubmitting ? 'Logging in...' : 'Login'}
           </Button>
         </form>
       </Card>
