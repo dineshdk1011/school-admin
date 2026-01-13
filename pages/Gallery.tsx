@@ -37,7 +37,7 @@ const storage = getStorage(storageApp);
 // Get Firestore from firestore app
 const db = getFirestore(firestoreApp);
 
-type Category = 'All' | 'Academics' | 'Sports' | 'Events' | 'Science' | 'Arts';
+type Category = 'All' | 'Junior' | 'Senior' | 'K1' | 'K2' | 'Day Care';
 
 interface GalleryItem {
   id: string;
@@ -49,12 +49,12 @@ interface GalleryItem {
   createdAt?: Timestamp;
 }
 
-const categories: Category[] = ['All', 'Academics', 'Sports', 'Events', 'Science', 'Arts'];
+const categories: Category[] = ['All', 'Junior', 'Senior', 'K1', 'K2', 'Day Care'];
 
 const Gallery: React.FC = () => {
   const [files, setFiles] = useState<File[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category>('All');
-  const [uploadCategory, setUploadCategory] = useState<Category>('Academics');
+  const [uploadCategory, setUploadCategory] = useState<Category>('Junior');
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
@@ -82,7 +82,7 @@ const Gallery: React.FC = () => {
           name: data.name,
           type: data.type,
           fullPath: data.fullPath,
-          category: data.category || 'Academics', // Default to Academics for old items
+          category: data.category || 'Junior', // Default to Junior for old items
           createdAt: data.createdAt
         });
       });
@@ -199,7 +199,7 @@ const Gallery: React.FC = () => {
       await Promise.all(uploadPromises);
       setFiles([]);
       setUploadProgress({});
-      setUploadCategory('Academics'); // Reset to default
+      setUploadCategory('Junior'); // Reset to default
       await loadGalleryItems();
       setError(null);
     } catch (err: any) {
@@ -277,11 +277,11 @@ const Gallery: React.FC = () => {
             className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
             disabled={uploading}
           >
-            <option value="Academics">Academics</option>
-            <option value="Sports">Sports</option>
-            <option value="Events">Events</option>
-            <option value="Science">Science</option>
-            <option value="Arts">Arts</option>
+            <option value="Junior">Junior</option>
+            <option value="Senior">Senior</option>
+            <option value="K1">K1</option>
+            <option value="K2">K2</option>
+            <option value="Day Care">Day Care</option>
           </select>
         </div>
 
@@ -371,29 +371,31 @@ const Gallery: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 )}
-                {category === 'Academics' && (
+                {category === 'Junior' && (
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                )}
+                {category === 'Senior' && (
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-5.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-5.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222 4 2.222V20" />
+                  </svg>
+                )}
+                {category === 'K1' && (
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
                 )}
-                {category === 'Sports' && (
+                {category === 'K2' && (
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 )}
-                {category === 'Events' && (
+                {category === 'Day Care' && (
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                )}
-                {category === 'Science' && (
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                  </svg>
-                )}
-                {category === 'Arts' && (
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
                 )}
                 <span>{category}</span>

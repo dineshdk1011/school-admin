@@ -12,6 +12,7 @@
 - `admissionForms` - For admission applications (needs read/write access)
 - `contactForms` - For contact messages (needs read/write access)
 - `jobApplications` - For job applications (needs read/write access)
+- `jobPosts` - For job postings (needs read/write access)
 
 ## ✅ Solution: Update Firestore Security Rules
 
@@ -56,6 +57,11 @@ service cloud.firestore {
     
     // Allow read/write access to jobApplications collection
     match /jobApplications/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow read/write access to jobPosts collection
+    match /jobPosts/{document=**} {
       allow read, write: if true;
     }
   }
@@ -132,6 +138,7 @@ To verify data is being saved:
   - `admissionForms` - Admission application forms (read/write access needed)
   - `contactForms` - Contact form messages (read/write access needed)
   - `jobApplications` - Job application forms (read/write access needed)
+  - `jobPosts` - Job postings created by admin (read/write access needed)
 
 ## 🔒 Production Security Rules
 
@@ -169,6 +176,12 @@ service cloud.firestore {
     match /jobApplications/{document=**} {
       allow read: if request.auth != null; // Only authenticated users can view
       allow write: if request.auth != null; // Only authenticated users can update
+    }
+    
+    // JobPosts collection - authenticated writes
+    match /jobPosts/{document=**} {
+      allow read: if request.auth != null; // Only authenticated users can view
+      allow write: if request.auth != null; // Only authenticated users can create/update
     }
   }
 }

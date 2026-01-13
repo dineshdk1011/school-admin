@@ -13,11 +13,11 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
-      // Navigate to dashboard when authenticated
       navigate('/', { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
@@ -30,8 +30,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    // Basic validation
+
     if (!email.trim() || !password.trim()) {
       setError('Please enter both email and password.');
       return;
@@ -41,19 +40,14 @@ const Login: React.FC = () => {
 
     try {
       const success = await login(email.trim(), password);
-      
+
       if (success) {
-        // Don't set isSubmitting to false here - let the redirect happen
-        // The useEffect will handle navigation when isAuthenticated changes
-        // AppRoutes will automatically show dashboard routes
         return;
       } else {
-        // Show error message above the button
         setError('Invalid email or password. Please check your credentials and try again.');
         setIsSubmitting(false);
       }
     } catch (err: any) {
-      // Show error message for any exceptions
       setError('An error occurred during login. Please try again.');
       console.error('Login error:', err);
       setIsSubmitting(false);
@@ -61,53 +55,122 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-secondary">
-      <Card className="w-full max-w-md">
-        <div className="text-center mb-8">
-            <div className="flex items-center justify-center mb-4">
-                 <svg className="w-12 h-12 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-            </div>
-            <h1 className="text-2xl font-bold text-primary">Admin Panel Login</h1>
-            <p className="text-gray-500">Please sign in to continue</p>
+    <div className="login-page-container">
+      {/* Purple Background Section */}
+      <div className="login-background">
+        {/* Subtle blurred shapes overlay */}
+        <div className="blurred-shapes">
+          <div className="shape shape-1"></div>
+          <div className="shape shape-2"></div>
+          <div className="shape shape-3"></div>
+          <div className="shape shape-4"></div>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Input 
-            id="email" 
-            label="Email Address" 
-            type="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-            placeholder="admin@example.com"
-          />
-          <Input 
-            id="password" 
-            label="Password" 
-            type="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
-            placeholder="••••••••"
-          />
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-              <div className="flex items-center">
-                <svg className="w-5 h-5 mr-2 text-red-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <span className="font-medium">{error}</span>
+
+        {/* Stars/Sparkles effect */}
+        <div className="stars">
+          <div className="star star-1"></div>
+          <div className="star star-2"></div>
+          <div className="star star-3"></div>
+          <div className="star star-4"></div>
+          <div className="star star-5"></div>
+          <div className="star star-6"></div>
+          <div className="star star-7"></div>
+          <div className="star star-8"></div>
+        </div>
+
+        {/* Header - Logo and Welcome centered */}
+        <div className="login-header">
+          <img src="/assets/logo.jpg" alt="Pranav Global School Logo" className="login-logo" />
+          <p className="welcome-text">Welcome!</p>
+        </div>
+      </div>
+
+      {/* Main Content: Form centered */}
+      <div className="login-content-wrapper">
+        {/* Login Form Card */}
+        <div className="login-form-card">
+          <div className="login-form-header">
+            <h2 className="login-title">Login</h2>
+            <p className="login-subtitle">Please login to admin dashboard</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="login-form">
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">
+                Email/Username*
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="john@gmail.com"
+                className="form-input"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">
+                Password*
+              </label>
+              <div className="password-input-wrapper">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  className="form-input password-input"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="password-toggle"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <svg className="eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.29 3.29m0 0L12 12m-5.71-5.71L12 12" />
+                    </svg>
+                  ) : (
+                    <svg className="eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
               </div>
             </div>
-          )}
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={isSubmitting || isLoading}
-          >
-            {isSubmitting ? 'Logging in...' : 'Login'}
-          </Button>
-        </form>
-      </Card>
+
+            <div className="form-options">
+              <label className="remember-me">
+                <input type="checkbox" className="remember-checkbox" />
+                <span>Remember me</span>
+              </label>
+              <a href="#" className="forgot-password">Forgot password?</a>
+            </div>
+
+            {error && (
+              <div className="error-message">
+                <svg className="error-icon" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span>{error}</span>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              className="login-button"
+              disabled={isSubmitting || isLoading}
+            >
+              {isSubmitting ? 'Logging in...' : 'Login'}
+            </Button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

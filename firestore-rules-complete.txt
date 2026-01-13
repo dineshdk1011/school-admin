@@ -11,6 +11,30 @@ service cloud.firestore {
     match /gallery/{document=**} {
       allow read, write: if true;
     }
+    
+    // Allow read/write access to admissionForms collection
+    match /admissionForms/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow read/write access to contactForms collection
+    match /contactForms/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow read/write access to jobApplications collection
+    match /jobApplications/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow read/write access to jobPosts collection
+    match /jobPosts/{document=**} {
+      allow read, write: if true;
+    }
+    
+    // Allow read/write access to homePage collection (for video and banner)
+    match /homePage/{document=**} {
+      allow read, write: if true;
+    }
   }
 }
-

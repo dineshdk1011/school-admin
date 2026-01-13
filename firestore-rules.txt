@@ -26,6 +26,11 @@ service cloud.firestore {
     match /jobApplications/{document=**} {
       allow read, write: if true;
     }
+    
+    // Allow read/write access to homePage collection (for video and banner)
+    match /homePage/{document=**} {
+      allow read, write: if true;
+    }
   }
 }
 

@@ -47,3 +47,32 @@ export interface ContactMessage {
   status: Status;
   createdAt: string;
 }
+
+export interface JobPost {
+  id: string;
+  title: string;
+  description: string;
+  department: string;
+  location: string;
+  type: string; // Full-time, Part-time, Contract
+  requirements: string;
+  salary?: string;
+  status: 'active' | 'closed';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface JobApplicationWithJob {
+  id: string;
+  jobPostId: string;
+  jobTitle: string;
+  name: string;
+  email: string;
+  phone: string;
+  city: string;
+  position: string;
+  resumeUrl: string;
+  coverLetter: string;
+  status: Status;
+  createdAt: string;
+}

@@ -6,9 +6,12 @@ import AdminLayout from './components/layout/AdminLayout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import JobApplications from './pages/JobApplications';
+import JobPosts from './pages/JobPosts';
 import AdmissionApplications from './pages/AdmissionApplications';
 import ContactMessages from './pages/ContactMessages';
 import Gallery from './pages/Gallery';
+import HomePageVideo from './pages/HomePageVideo';
+import HomePageBanner from './pages/HomePageBanner';
 
 const AppRoutes: React.FC = () => {
     const { isAuthenticated, isLoading } = useAuth();
@@ -39,9 +42,12 @@ const AppRoutes: React.FC = () => {
             <Route element={<AdminLayout />}>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/job-applications" element={<JobApplications />} />
+                <Route path="/job-posts" element={<JobPosts />} />
                 <Route path="/admission-applications" element={<AdmissionApplications />} />
                 <Route path="/contact-messages" element={<ContactMessages />} />
                 <Route path="/gallery" element={<Gallery />} />
+                <Route path="/homepage-video" element={<HomePageVideo />} />
+                <Route path="/homepage-banner" element={<HomePageBanner />} />
                 <Route path="*" element={<Navigate to="/" />} />
             </Route>
         </Routes>
