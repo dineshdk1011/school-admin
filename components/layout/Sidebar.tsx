@@ -46,8 +46,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             className="h-10 w-20  object-contain rounded-full bg-white p-1 mb-2"
           />
           <div className="text-center">
-            <div className="text-xs font-bold text-white leading-tight">PRANAV GLOBAL SCHOOL</div>
-            <div className="text-[10px] text-gray-300 mt-0.5 uppercase">EDUCATE.EMPOWER.EXCEL</div>
+            <div className="text-md font-bold text-white leading-tight">PRANAV GLOBAL SCHOOL</div>
+            <p className="text-xs text-gray-300 mt-2 uppercase">EDUCATE.EMPOWER.EXCEL</p>
           </div>
         </div>
         <nav className="flex-1 px-2 py-4 space-y-2">
