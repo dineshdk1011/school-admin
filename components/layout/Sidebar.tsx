@@ -47,7 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           />
           <div className="text-center">
             <div className="text-md font-bold text-white leading-tight">PRANAV GLOBAL SCHOOL</div>
-            <p className="text-xs text-gray-300 mt-2 uppercase">EDUCATE.EMPOWER.EXCEL</p>
+            <p className="text-xs text-gray-300 mt-1 uppercase">EDUCATE.EMPOWER.EXCEL</p>
           </div>
         </div>
         <nav className="flex-1 px-2 py-4 space-y-2">
