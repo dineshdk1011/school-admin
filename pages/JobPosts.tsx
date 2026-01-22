@@ -414,6 +414,7 @@ const JobPosts: React.FC = () => {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b bg-gray-50">
+                  <th className="p-3 text-sm font-semibold text-gray-600">S.No</th>
                   <th className="p-3 text-sm font-semibold text-gray-600">Title</th>
                   <th className="p-3 text-sm font-semibold text-gray-600">Department</th>
                   <th className="p-3 text-sm font-semibold text-gray-600">Location</th>
@@ -424,8 +425,9 @@ const JobPosts: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentData.map(post => (
+                {currentData.map((post, index) => (
                   <tr key={post.id} className="border-b hover:bg-gray-50">
+                    <td className="p-3 text-sm text-gray-700 font-medium">{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
                     <td className="p-3 text-sm font-medium text-gray-900">{post.title}</td>
                     <td className="p-3 text-sm text-gray-700">{post.department}</td>
                     <td className="p-3 text-sm text-gray-700">{post.location || 'N/A'}</td>

@@ -207,7 +207,7 @@ const ContactMessages: React.FC = () => {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b bg-gray-50">
-                  <th className="p-3 text-sm font-semibold text-gray-600">ID</th>
+                  <th className="p-3 text-sm font-semibold text-gray-600">S.No</th>
                   <th className="p-3 text-sm font-semibold text-gray-600">Name</th>
                   <th className="p-3 text-sm font-semibold text-gray-600">Email</th>
                   <th className="p-3 text-sm font-semibold text-gray-600">Subject</th>
@@ -217,9 +217,9 @@ const ContactMessages: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentData.map(msg => (
+                {currentData.map((msg, index) => (
                   <tr key={msg.id} className="border-b hover:bg-gray-50">
-                    <td className="p-3 text-sm text-gray-700 font-mono">{msg.id.substring(0, 8)}...</td>
+                    <td className="p-3 text-sm text-gray-700 font-medium">{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
                   <td className="p-3 text-sm font-medium text-gray-900">{`${msg.firstName} ${msg.lastName}`}</td>
                   <td className="p-3 text-sm text-gray-700">{msg.email}</td>
                   <td className="p-3 text-sm text-gray-700">{msg.subject}</td>

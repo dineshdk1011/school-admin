@@ -212,7 +212,7 @@ const AdmissionApplications: React.FC = () => {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b bg-gray-50">
-                  <th className="p-3 text-sm font-semibold text-gray-600">ID</th>
+                  <th className="p-3 text-sm font-semibold text-gray-600">S.No</th>
                   <th className="p-3 text-sm font-semibold text-gray-600">Student Name</th>
                   <th className="p-3 text-sm font-semibold text-gray-600">Parent Name</th>
                   <th className="p-3 text-sm font-semibold text-gray-600">Grade</th>
@@ -222,9 +222,9 @@ const AdmissionApplications: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentData.map(app => (
+                {currentData.map((app, index) => (
                 <tr key={app.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 text-sm text-gray-700 font-mono">{app.id.substring(0, 8)}...</td>
+                  <td className="p-3 text-sm text-gray-700 font-medium">{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
                   <td className="p-3 text-sm font-medium text-gray-900">{app.studentName}</td>
                   <td className="p-3 text-sm text-gray-700">{app.parentName}</td>
                   <td className="p-3 text-sm text-gray-700">{app.grade}</td>
